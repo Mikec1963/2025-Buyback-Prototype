@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shareholder Buyback Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .section {
+            background: white;
+            margin-bottom: 30px;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .position-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .position-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .company-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+        
+        .shares-owned {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .pro-rata-info {
+            background: #e8f4f8;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .action-buttons.five-buttons {
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn-hold {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-hold:hover {
+            background: #219a52;
+        }
+        
+        .btn-sell-pro-rata {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-sell-pro-rata:hover {
+            background: #d68910;
+        }
+        
+        .btn-sell-2x {
+            background: #e67e22;
+            color: white;
+        }
+        
+        .btn-sell-2x:hover {
+            background: #d35400;
+        }
+        
+        .btn-sell-max {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-sell-max:hover {
+            background: #c0392b;
+        }
+        
+        .btn-buyer {
+            background: #9b59b6;
+            color: white;
+        }
+        
+        .btn-buyer:hover {
+            background: #8e44ad;
+        }
+        
+        .btn-selected {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .contact-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            transform: scale(1.2);
+        }
+        
+        .info-box {
+            background: #e8f5e8;
+            border-left: 4px solid #27ae60;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .warning-box {
+            background: #fef5e7;
+            border-left: 4px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .submit-section {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .summary-box {
+            background: #f0f8ff;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        @media (max-width: 768px) {
+            .contact-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons.five-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AV Unit Holder Buyback Portal</h1>
+            <p>Manage your participation in the current buyback opportunity</p>
+        </div>
+
+        <!-- About the Buyback Section -->
+        <div class="section">
+            <h2>About This Buyback</h2>
+            <div class="info-box">
+                <h3>Buyback Details</h3>
+                <p><strong>Company:</strong> Alumni Ventures</p>
+                <p><strong>Total Buyback Amount:</strong> $10,000,000</p>
+                <p><strong>Price per Share:</strong> $26.00</p>
+                <p><strong>Minimum Buyback:</strong> $5,000</p>
+                <p><strong>Participation Deadline:</strong> November 15, 2025</p>
+                <p><strong>Settlement Date:</strong> January 15, 2026</p>
+            </div>
+
+            <div class="info-box" style="background: #f0f8ff; border-left: 4px solid #3498db;">
+                <h3>A Note from the CEO</h3>
+                <p style="font-style: italic; margin-bottom: 15px;">
+                    Periodically, AV buys back stock from its unit holders. As you know, AV is undergoing a massive investment to grow: AUM, geographic reach, raise non-retail funds, PEP spin, etc. However, we also recognize that coming out of COVID and the POST-COVID Tech correction that we are overdue for a buyback and felt this modest, simple-to-execute fixed price buyback of $10M made sense to communicate how seriously we take owner liquidity and to keep our buyback engine greased.
+                </p>
+                <p style="font-weight: bold;">
+                    Buy, Sell A little, Sell a Lot or Hold. The decision is yours.
+                </p>
+                <p style="text-align: right; margin-top: 15px; font-weight: bold;">
+                    - Mike
+                </p>
+            </div>
+            
+            <p>This buyback is being offered on a pro-rata basis, meaning each unit holder has the right to sell a portion of their holdings based on their ownership percentage. You may also elect to sell additional units up to 2x your pro-rata amount, or more, subject to availability.</p>
+            
+            <div class="warning-box">
+                <h4>Important Notes:</h4>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>All elections are binding once submitted</li>
+                    <li>Minimum buyback amount is $5,000</li>
+                    <li>Over-subscriptions will be allocated on a pro-rata basis</li>
+                    <li>Tax implications may apply - consult your tax advisor</li>
+                    <li>This offer expires on November 15, 2025</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Portfolio Section -->
+        <div class="section">
+            <h2>Your AV Holdings & Elections</h2>
+            
+            <div class="info-box" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div>
+                    <strong>Questions about the buyback?</strong>
+                </div>
+                <div>
+                    <a href="#" onclick="openEmailPopup()" style="color: #3498db; text-decoration: none; font-weight: bold;">Email us your questions</a>
+                </div>
+            </div>
+
+            <div class="portfolio-grid" id="portfolioGrid">
+                <!-- Sample positions - these would be dynamically populated -->
+                <div class="position-card">
+                    <div class="position-header">
+                        <div class="company-name">AV Units</div>
+                        <div class="shares-owned">1,500 units</div>
+                    </div>
+                    <div class="pro-rata-info">
+                        <strong>Your Pro-Rata Share:</strong> 150 units ($3,900)<br>
+                        <strong>2x Pro-Rata:</strong> 300 units ($7,800)<br>
+                        <strong>Maximum Available:</strong> 1,500 units ($39,000)
+                    </div>
+                    <div class="action-buttons" style="grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 8px;">
+                        <button class="action-btn btn-hold" onclick="selectAction(this, 'hold', 'AV')">Hold</button>
+                        <button class="action-btn btn-sell-pro-rata" onclick="selectAction(this, 'pro-rata', 'AV')">Sell 1x Pro-Rata</button>
+                        <button class="action-btn btn-sell-2x" onclick="selectAction(this, '2x', 'AV')">Sell 2x Pro-Rata</button>
+                        <button class="action-btn btn-sell-max" onclick="selectAction(this, 'max', 'AV')">Sell As Much As Possible</button>
+                        <button class="action-btn btn-buyer" onclick="selectAction(this, 'buyer', 'AV')">I'd Like to Buy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkbox-group" style="margin-top: 20px;">
+                <input type="checkbox" id="applyToAll" name="applyToAll">
+                <label for="applyToAll">Apply this election to all my AV positions</label>
+            </div>
+
+            <!-- Election Summary -->
+            <div class="summary-box" id="summaryBox" style="display: none;">
+                <h3>Election Summary</h3>
+                <div id="summaryContent"></div>
+            </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div class="section">
+            <h2>Contact Information</h2>
+            <form id="buybackForm">
+                <div class="contact-form">
+                    <div class="form-group">
+                        <label for="firstName">First Name *</label>
+                        <input type="text" id="firstName" name="firstName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lastName">Last Name *</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="address">Address *</label>
+                        <textarea id="address" name="address" rows="3" required placeholder="Street Address, City, State, ZIP"></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Submit Section -->
+        <div class="submit-section">
+            <div class="warning-box" style="text-align: left; margin-bottom: 20px;">
+                <h4>Before You Submit:</h4>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Review all your elections carefully</li>
+                    <li>Ensure your contact information is accurate</li>
+                    <li>Remember that all elections are binding</li>
+                    <li>Keep a copy of this form for your records</li>
+                </ul>
+            </div>
+
+            <div class="info-box" style="text-align: left; margin-bottom: 20px;">
+                <h4>Next Steps:</h4>
+                <p>After you submit this form:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>We'll calculate the amount and notify you</li>
+                    <li>We'll be sending DocuSign documents for your electronic signature</li>
+                    <li>Settlement will occur on January 15, 2026</li>
+                </ul>
+            </div>
+            
+            <button type="submit" class="btn-submit" onclick="submitForm()">Submit Buyback Elections</button>
+            <p style="margin-top: 15px; color: #666; font-size: 0.9em;">
+                By submitting this form, you acknowledge that you have read and understand the terms of the buyback program.
+            </p>
+        </div>
+
+        <!-- Legal Disclaimer -->
+        <div class="section" style="background: #f8f9fa; border: 1px solid #ddd;">
+            <h3 style="color: #666; margin-bottom: 15px;">Legal Disclosure</h3>
+            <p style="font-size: 0.9em; color: #666; line-height: 1.5;">
+                This buyback offer is made solely on the terms and conditions set forth herein and in the related documentation. The information contained herein does not constitute an offer to sell or a solicitation of an offer to buy securities in any jurisdiction where such offer or solicitation would be unlawful. This offer is being made only to existing unit holders of Alumni Ventures and is not transferable. All elections are binding and irrevocable once submitted. Unit holders should consult with their own tax and legal advisors regarding the implications of participating in this buyback. Alumni Ventures reserves the right to modify or terminate this offer at any time prior to the deadline. Past performance is not indicative of future results. All investments involve risk, including the potential loss of principal. By participating in this buyback, you acknowledge that you have read, understood, and agree to be bound by all terms and conditions of this offer.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let elections = {};
+        let userData = {};
+        
+        // Email popup functionality
+        function openEmailPopup() {
+            const subject = encodeURIComponent('AV Buyback Question');
+            const body = encodeURIComponent('Hi,\n\nI have a question about the Alumni Ventures buyback program:\n\n\n\nThank you,');
+            const mailtoLink = `mailto:Buyback25@av.vc?subject=${subject}&body=${body}`;
+            
+            // Try to open email client
+            window.location.href = mailtoLink;
+            
+            // Also show a popup for confirmation
+            setTimeout(() => {
+                alert('Opening your email client to send a message to Buyback25@av.vc. If your email client doesn\'t open automatically, please email us directly at Buyback25@av.vc');
+            }, 100);
+        }
+        
+        function selectAction(button, action, company) {
+            // Remove selected class from all buttons in this position
+            const positionCard = button.closest('.position-card');
+            const allButtons = positionCard.querySelectorAll('.action-btn');
+            allButtons.forEach(btn => btn.classList.remove('btn-selected'));
+            
+            // Add selected class to clicked button
+            button.classList.add('btn-selected');
+            
+            // Store the election
+            elections[company] = action;
+            
+            // If apply to all is checked, apply this selection to all positions
+            const applyToAll = document.getElementById('applyToAll');
+            if (applyToAll && applyToAll.checked) {
+                // Apply to all position cards
+                const allPositionCards = document.querySelectorAll('.position-card');
+                allPositionCards.forEach(card => {
+                    const cardButtons = card.querySelectorAll('.action-btn');
+                    cardButtons.forEach(btn => btn.classList.remove('btn-selected'));
+                    
+                    const targetButton = card.querySelector(`.btn-${action === 'pro-rata' ? 'sell-pro-rata' : action === '2x' ? 'sell-2x' : action === 'max' ? 'sell-max' : action === 'buyer' ? 'buyer' : 'hold'}`);
+                    if (targetButton) {
+                        targetButton.classList.add('btn-selected');
+                    }
+                });
+                
+                // Store elections for all companies (in real app, this would be dynamic)
+                elections['AV'] = action;
+                console.log('Applied', action, 'to all positions');
+            }
+            
+            // Update summary
+            updateSummary();
+        }
+        
+        function updateSummary() {
+            const summaryBox = document.getElementById('summaryBox');
+            const summaryContent = document.getElementById('summaryContent');
+            
+            if (Object.keys(elections).length > 0) {
+                let summaryHTML = '';
+                let totalProceeds = 0;
+                
+                for (const [company, action] of Object.entries(elections)) {
+                    let description = '';
+                    let proceeds = 0;
+                    
+                    switch(action) {
+                        case 'hold':
+                            description = 'Holding all units';
+                            proceeds = 0;
+                            break;
+                        case 'pro-rata':
+                            description = 'Selling 1x pro-rata share';
+                            proceeds = 3900; // AV units at $26 each
+                            break;
+                        case '2x':
+                            description = 'Selling 2x pro-rata';
+                            proceeds = 7800;
+                            break;
+                        case 'max':
+                            description = 'Selling as much as possible';
+                            proceeds = 39000;
+                            break;
+                        case 'buyer':
+                            description = 'Interested in buying more units';
+                            proceeds = 0;
+                            break;
+                    }
+                    
+                    totalProceeds += proceeds;
+                    summaryHTML += `
+                        <div class="summary-item">
+                            <span>${company}</span>
+                            <span>${description} - $${proceeds.toLocaleString()}</span>
+                        </div>
+                    `;
+                }
+                
+                summaryHTML += `
+                    <div class="summary-item">
+                        <span>Total Expected Proceeds</span>
+                        <span>$${totalProceeds.toLocaleString()}</span>
+                    </div>
+                `;
+                
+                summaryContent.innerHTML = summaryHTML;
+                summaryBox.style.display = 'block';
+            } else {
+                summaryBox.style.display = 'none';
+            }
+        }
+        
+        // Collect all form data
+        function collectFormData() {
+            const formData = {
+                // Personal Information
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                
+                // Elections
+                elections: elections,
+                
+                // Metadata
+                submissionTimestamp: new Date().toISOString(),
+                ipAddress: 'CLIENT_IP', // This would be populated server-side
+                userAgent: navigator.userAgent,
+                
+                // Calculated fields for Vertica
+                totalExpectedProceeds: calculateTotalProceeds(),
+                hasElections: Object.keys(elections).length > 0,
+                electionTypes: Object.values(elections),
+                
+                // Compliance
+                acknowledgedTerms: true,
+                minimumMet: calculateTotalProceeds() >= 5000,
+                
+                // For tracking
+                formVersion: '1.0',
+                campaign: 'AV_BUYBACK_2025'
+            };
+            
+            return formData;
+        }
+        
+        function calculateTotalProceeds() {
+            let total = 0;
+            for (const [company, action] of Object.entries(elections)) {
+                switch(action) {
+                    case 'pro-rata':
+                        total += 3900;
+                        break;
+                    case '2x':
+                        total += 7800;
+                        break;
+                    case 'max':
+                        total += 39000;
+                        break;
+                }
+            }
+            return total;
+        }
+        
+        // Generate Vertica INSERT statement for Andrew
+        function generateVerticaInsert(formData) {
+            const insertSQL = `
+INSERT INTO av_buyback_submissions (
+    submission_id,
+    first_name,
+    last_name,
+    email,
+    phone,
+    address,
+    elections_json,
+    total_expected_proceeds,
+    submission_timestamp,
+    user_agent,
+    has_elections,
+    election_summary,
+    minimum_met,
+    form_version,
+    campaign,
+    status
+) VALUES (
+    '${generateUUID()}',
+    '${formData.firstName.replace(/'/g, "''")}',
+    '${formData.lastName.replace(/'/g, "''")}',
+    '${formData.email}',
+    '${formData.phone}',
+    '${formData.address.replace(/'/g, "''").replace(/\n/g, ' ')}',
+    '${JSON.stringify(formData.elections)}',
+    ${formData.totalExpectedProceeds},
+    '${formData.submissionTimestamp}',
+    '${formData.userAgent.replace(/'/g, "''")}',
+    ${formData.hasElections},
+    '${Object.entries(formData.elections).map(([k,v]) => `${k}:${v}`).join(',')}',
+    ${formData.minimumMet},
+    '${formData.formVersion}',
+    '${formData.campaign}',
+    'SUBMITTED'
+);`;
+            
+            return insertSQL;
+        }
+        
+        function generateUUID() {
+            return 'av-buyback-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // Email templates
+        function generateAcknowledgmentEmail(formData) {
+            const electionSummary = Object.entries(formData.elections)
+                .map(([company, action]) => {
+                    let desc = '';
+                    switch(action) {
+                        case 'hold': desc = 'Hold all units'; break;
+                        case 'pro-rata': desc = 'Sell 1x pro-rata share'; break;
+                        case '2x': desc = 'Sell 2x pro-rata'; break;
+                        case 'max': desc = 'Sell as much as possible'; break;
+                        case 'buyer': desc = 'Interested in buying more'; break;
+                    }
+                    return `${company}: ${desc}`;
+                })
+                .join('\n');
+                
+            return {
+                to: formData.email,
+                from: 'Buyback25@av.vc',
+                subject: 'AV Buyback Election Confirmation',
+                html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #2c3e50;">Alumni Ventures Buyback Confirmation</h2>
+                    
+                    <p>Dear ${formData.firstName} ${formData.lastName},</p>
+                    
+                    <p>Thank you for submitting your buyback election. We have received your submission and are processing your request.</p>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
+                        <h3>Your Elections:</h3>
+                        <pre style="font-family: Arial, sans-serif;">${electionSummary}</pre>
+                        <p><strong>Total Expected Proceeds: $${formData.totalExpectedProceeds.toLocaleString()}</strong></p>
+                    </div>
+                    
+                    <div style="background: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                        <h4>Next Steps:</h4>
+                        <ul>
+                            <li>We'll calculate the final amount and notify you</li>
+                            <li>DocuSign documents will be sent for your electronic signature</li>
+                            <li>Settlement will occur on January 15, 2026</li>
+                        </ul>
+                    </div>
+                    
+                    <p>If you have any questions, please contact us at <a href="mailto:Buyback25@av.vc">Buyback25@av.vc</a></p>
+                    
+                    <p>Best regards,<br>Alumni Ventures Team</p>
+                    
+                    <hr style="margin: 30px 0;">
+                    <p style="font-size: 12px; color: #666;">
+                        Submission ID: ${generateUUID()}<br>
+                        Submitted: ${new Date(formData.submissionTimestamp).toLocaleString()}
+                    </p>
+                </div>
+                `
+            };
+        }
+        
+        function submitForm() {
+            // Validate that elections have been made
+            const positionCards = document.querySelectorAll('.position-card');
+            const electionsCount = Object.keys(elections).length;
+            
+            if (electionsCount < positionCards.length) {
+                alert('Please make an election for all AV positions before submitting.');
+                return;
+            }
+            
+            // Validate required form fields
+            const requiredFields = ['firstName', 'lastName', 'email', 'address'];
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                const element = document.getElementById(field);
+                if (!element.value.trim()) {
+                    isValid = false;
+                    element.style.borderColor = '#e74c3c';
+                } else {
+                    element.style.borderColor = '#ddd';
+                }
+            });
+            
+            if (!isValid) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Check minimum buyback amount
+            const totalProceeds = calculateTotalProceeds();
+            if (totalProceeds > 0 && totalProceeds < 5000) {
+                alert('Minimum buyback amount is $5,000. Please adjust your election or select Hold.');
+                return;
+            }
+            
+            // Collect all data
+            const formData = collectFormData();
+            
+            // Generate outputs for Andrew
+            const verticaSQL = generateVerticaInsert(formData);
+            const acknowledgmentEmail = generateAcknowledgmentEmail(formData);
+            
+            // In production, these would be sent to your backend
+            console.log('=== VERTICA INSERT STATEMENT ===');
+            console.log(verticaSQL);
+            console.log('\n=== ACKNOWLEDGMENT EMAIL ===');
+            console.log(JSON.stringify(acknowledgmentEmail, null, 2));
+            console.log('\n=== FULL FORM DATA ===');
+            console.log(JSON.stringify(formData, null, 2));
+            
+            // Show success message
+            alert(`Thank you ${formData.firstName}! Your AV buyback elections have been submitted successfully. You will receive a confirmation email at ${formData.email} and DocuSign documents shortly.`);
+            
+            // In production, this would be an API call:
+            /*
+            fetch('/api/buyback/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(result => {
+                // Handle success/error
+            });
+            */
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply to all positions functionality
+            const applyToAllCheckbox = document.getElementById('applyToAll');
+            if (applyToAllCheckbox) {
+                applyToAllCheckbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        console.log('Will apply selected election to all AV positions');
+                        // Clear existing elections when checkbox is checked
+                        // This ensures clean state for apply-to-all functionality
+                    } else {
+                        console.log('Apply to all disabled - individual selections allowed');
+                    }
+                });
+            }
+            
+            // Add form validation styling
+            const form = document.getElementById('buybackForm');
+            if (form) {
+                form.addEventListener('input', function(e) {
+                    if (e.target.value.trim()) {
+                        e.target.style.borderColor = '#27ae60';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
